@@ -3,7 +3,8 @@ project(BugsLife)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(BugsLife main.cpp)
+add_executable(BugsLife main.cpp
+        Bug.h)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 set(SFML_DIR C:/SFML-2.6.1/lib/cmake/SFML)
