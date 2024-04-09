@@ -31,7 +31,7 @@ public:
 
 
     virtual void move() = 0;
-    bool isWayBlocked() {} //Implement after board creation
+    bool isWayBlocked(); //Implement after board creation
 };
 
 
