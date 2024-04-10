@@ -10,9 +10,10 @@
 class Hopper : public Bug {
 public:
     using Bug::Bug;  //Allows to use constructor from Parent Class "Bug"
+    Hopper(); //Constructor for hopLength value initialization for each Hopper instance created
 
 private:
-    int hopLength = std::rand() % 4 + 2;
+    int hopLength;
 
     void move() override;  //Overrides the virtual function in Bug class to Crawler bug
     Direction RandomDirection();
