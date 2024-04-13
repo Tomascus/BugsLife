@@ -2,12 +2,19 @@
 #include <iostream>
 #include "Crawler.h"
 #include "Hopper.h"
+#include "Board.h"
 #include <vector>
 
 using namespace sf;
 using namespace std;
 
 int main() {
+
+    Board board;
+
+    // Display the board
+    board.display();
+
     std::vector<Bug*> bug_vector; //Create a vector of pointers to bug objects
 
     //Create specific bugs on heap
@@ -27,8 +34,6 @@ int main() {
     for (Bug* bug : bug_vector) { //Deletes bugs from heap
         delete bug;
     }
-
-    //sf::RenderWindow window(sf::VideoMode(1000, 1000), "Bugs Life, The Game!");
 
     return 0;
 
