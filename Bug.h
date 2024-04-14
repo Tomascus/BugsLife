@@ -25,6 +25,21 @@ protected:
     bool alive;
     std::list<std::pair<int,int>> path;
 
+    //Getters & Setters
+public:
+    int getId() const;
+    void setId(int id);
+    const std::pair<int, int> &getPosition() const;
+    void setPosition(const std::pair<int, int> &position);
+    Direction getDirection() const;
+    void setDirection(Direction direction);
+    int getSize() const;
+    void setSize(int size);
+    bool isAlive() const;
+    void setAlive(bool alive);
+    const std::list<std::pair<int, int>> &getPath() const;
+    void setPath(const std::list<std::pair<int, int>> &path);
+
 public:
     Bug(); //Empty constructor
     Bug(int id, std::pair<int, int> position, Direction direction, int size, bool alive, std::list<std::pair<int,int>> path);

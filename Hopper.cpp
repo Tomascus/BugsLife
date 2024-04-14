@@ -7,9 +7,15 @@
 #include "Hopper.h"
 
 
-Hopper::Hopper(int id, std::pair<int, int> position, Direction direction, int size, int hopLength)
-        : Bug(id, position, direction, size), hopLength(hopLength) {
-
+Hopper::Hopper(int id, std::pair<int, int> position, Direction direction, int size, bool alive,
+               std::list<std::pair<int, int>> path, int hopLength) {
+    this->id = id;
+    this->position = position;
+    this->direction = direction;
+    this->size = size;
+    this->alive = alive;
+    this->path = path;
+    this->hopLength = hopLength;
 }
 
 
@@ -55,3 +61,13 @@ void Hopper::moveInDirection(Direction direction, int hopLength) { //Basic move 
             break;
     }
 }
+
+int Hopper::getHopLength() const {
+    return hopLength;
+}
+
+void Hopper::setHopLength(int hopLength) {
+    this->hopLength = hopLength;
+}
+
+

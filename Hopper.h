@@ -10,10 +10,15 @@
 class Hopper : public Bug {
 public:
     using Bug::Bug;  //Allows to use constructor from Parent Class "Bug"
-    Hopper(int id, std::pair<int, int> position, Direction direction, int size, int hopLength);
+    Hopper(int id, std::pair<int, int> position, Direction direction, int size, bool alive, std::list<std::pair<int,int>> path, int hopLength);
 
 private:
     int hopLength;
+public:
+    int getHopLength() const;
+    void setHopLength(int hopLength);
+
+private:
 
     void move() override;  //Overrides the virtual function in Bug class to Crawler bug
     Direction RandomDirection();

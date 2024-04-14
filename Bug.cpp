@@ -38,5 +38,53 @@ bool Bug::isWayBlocked()
 //Implement after board creation
 }
 
+int Bug::getId() const {
+    return id;
+}
+
+void Bug::setId(int id) {
+    Bug::id = id;
+}
+
+const std::pair<int, int> &Bug::getPosition() const {
+    return position;
+}
+
+void Bug::setPosition(const std::pair<int, int> &position) {
+    Bug::position = position;
+}
+
+Direction Bug::getDirection() const {
+    return direction;
+}
+
+void Bug::setDirection(Direction direction) {
+    Bug::direction = direction;
+}
+
+int Bug::getSize() const {
+    return size;
+}
+
+void Bug::setSize(int size) {
+    Bug::size = size;
+}
+
+bool Bug::isAlive() const {
+    return alive;
+}
+
+void Bug::setAlive(bool alive) {
+    Bug::alive = alive;
+}
+
+const std::list<std::pair<int, int>> &Bug::getPath() const {
+    return path;
+}
+
+void Bug::setPath(const std::list<std::pair<int, int>> &path) {
+    Bug::path = path;
+}
+
 
 
