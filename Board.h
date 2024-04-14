@@ -16,7 +16,7 @@ public:
     void display();
 private:
     static constexpr int boardSize = 10; //Size of the board
-    std::vector<std::vector<sf::RectangleShape>> cells; // vector for board cells
+    std::vector<std::vector<sf::RectangleShape>> board; // vector for board cells
 };
 
 

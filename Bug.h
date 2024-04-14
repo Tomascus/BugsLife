@@ -28,7 +28,7 @@ protected:
 public:
     Bug(); //Empty constructor
     Bug(int id, std::pair<int, int> position, Direction direction, int size, bool alive, std::list<std::pair<int,int>> path);
-
+    Bug(int id, std::pair<int, int> position, Direction direction, int size);
 
     virtual void move() = 0;
     bool isWayBlocked(); //Implement after board creation

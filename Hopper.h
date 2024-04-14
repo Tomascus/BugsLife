@@ -10,7 +10,7 @@
 class Hopper : public Bug {
 public:
     using Bug::Bug;  //Allows to use constructor from Parent Class "Bug"
-    Hopper(); //Constructor for hopLength value initialization for each Hopper instance created
+    Hopper(int id, std::pair<int, int> position, Direction direction, int size, int hopLength);
 
 private:
     int hopLength;

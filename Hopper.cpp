@@ -6,9 +6,12 @@
 #include <ctime>
 #include "Hopper.h"
 
-Hopper::Hopper() { //Constructor specification
-    hopLength = std::rand() % 4 + 2; //Generates random hopping number each time for each Hopper instance
+
+Hopper::Hopper(int id, std::pair<int, int> position, Direction direction, int size, int hopLength)
+        : Bug(id, position, direction, size), hopLength(hopLength) {
+
 }
+
 
 void Hopper::move() {
     if (isWayBlocked()) { //Implements Bug method isWayBlocked

@@ -24,7 +24,19 @@ Bug::Bug(int id, std::pair<int, int> position, Direction direction, int size, bo
     this->path = path;
 }
 
+Bug::Bug(int id, std::pair<int, int> position, Direction direction, int size)
+{
+    this->id = id;
+    this->position = position;
+    this->direction = direction;
+    this->size = size;
+}
+
+
 bool Bug::isWayBlocked()
 {
 //Implement after board creation
 }
+
+
+
