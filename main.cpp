@@ -11,6 +11,7 @@ using namespace std;
 
 void bugFileReader(vector<Bug*>& bug_vector);
 void displayAllBugs(const vector<Bug*>& bug_vector);
+void findBugById(const vector<Bug*>& bug_vector);
 
 int main() {
 
@@ -21,6 +22,7 @@ int main() {
 
     //Display all bugs in a formatted manner
     displayAllBugs(bug_vector);
+    findBugById(bug_vector);
 
 
     //Display the board
@@ -40,6 +42,44 @@ int main() {
     return 0;
 }
 
+//Feature 3
+
+void findBugById(const vector<Bug*>& bug_vector) {
+    int id;
+    cout << "Enter an ID to find a bug: ";
+    cin >> id;
+
+    bool found = false;
+    for (const auto& bug : bug_vector) { //iterator of bug_vector
+        if (bug->getId() == id) {
+            found = true;
+            cout << "Bug found:" << endl;
+            cout << "ID: " << bug->getId() << endl;
+            if (dynamic_cast<Crawler*>(bug)) {
+                cout << "Type: Crawler" << endl;
+            } else if (dynamic_cast<Hopper*>(bug)) {
+                cout << "Type: Hopper" << endl;
+                Hopper* hopper = dynamic_cast<Hopper*>(bug);
+                cout << "Hop Length: " << hopper->getHopLength() << endl; //Additional content for Hopper bug - hopLength
+            }
+            cout << "Location: (" << bug->getPosition().first << "," << bug->getPosition().second << ")" << endl;
+            cout << "Size: " << bug->getSize() << endl;
+            cout << "Direction: " << static_cast<int>(bug->getDirection()) << endl;
+            cout << "Status: ";
+            if (bug->isAlive()) {
+                cout << "Alive" << endl;
+            } else {
+                cout << "Dead" << endl;
+            }
+            break; //Exits loop once bug is found
+        }
+    }
+
+    if (!found) {
+        cout << "Bug " << id << " not found." << endl;
+    }
+}
+
 //Feature 2
 
 void displayAllBugs(const vector<Bug*>& bug_vector) {
@@ -52,11 +92,11 @@ void displayAllBugs(const vector<Bug*>& bug_vector) {
             Hopper* hopper = dynamic_cast<Hopper*>(bug); //Create pointer to a hopper bug/object with hopper variable that we can use to display additional features of such bug
             cout << "(" << hopper->getHopLength() << ") "; //Display hopLength using hopper pointer
         }
-        // Display location, size, direction, and status
+
         cout << "(" << bug->getPosition().first << "," << bug->getPosition().second << ") " //I have to get each coordinate separately, otherwise I would have to create an overloaded "<<" for pair to specify
              << bug->getSize() << " " //Displays Size
              << static_cast<int>(bug->getDirection()) << " "; //Displays direction Enum
-        if (bug->isAlive()) {
+        if (bug->isAlive()) { //Displays status - Alive or Dead
             cout << "Alive";
         } else {
             cout << "Dead";
