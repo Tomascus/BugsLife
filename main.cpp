@@ -12,6 +12,8 @@ using namespace std;
 void bugFileReader(vector<Bug*>& bug_vector);
 void displayAllBugs(const vector<Bug*>& bug_vector);
 void findBugById(const vector<Bug*>& bug_vector);
+void tapBugBoard(vector<Bug*>& bug_vector);
+//void displayBugHistory(const vector<Bug*>& bug_vector);
 
 int main() {
 
@@ -22,17 +24,15 @@ int main() {
 
     //Display all bugs in a formatted manner
     displayAllBugs(bug_vector);
-    findBugById(bug_vector);
+    //findBugById(bug_vector);
+    tapBugBoard(bug_vector);
+    //displayBugHistory(bug_vector);
 
 
     //Display the board
     /*Board board;
     board.display();*/
 
-    //Basic version, without mouse click
-    for (Bug* bug : bug_vector) {  //Starts "move", specific to each bug type
-        bug->move();
-    }
 
     //Basic version, without alive logic
     /*for (Bug* bug : bug_vector) { //Deletes bugs from heap
@@ -40,6 +40,15 @@ int main() {
     }*/
 
     return 0;
+}
+
+
+//Feature 4
+
+void tapBugBoard(vector<Bug*>& bug_vector) {
+    for (Bug* bug : bug_vector) {
+        bug->move();
+    }
 }
 
 //Feature 3

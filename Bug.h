@@ -46,7 +46,7 @@ public:
     Bug(int id, std::pair<int, int> position, Direction direction, int size);
 
     virtual void move() = 0;
-    bool isWayBlocked(); //Implement after board creation
+    bool isWayBlocked();
 };
 
 

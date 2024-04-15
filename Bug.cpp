@@ -33,9 +33,34 @@ Bug::Bug(int id, std::pair<int, int> position, Direction direction, int size)
 }
 
 
-bool Bug::isWayBlocked()
-{
-//Implement after board creation
+bool Bug::isWayBlocked() {
+
+    std::pair<int, int> currentPosition = getPosition(); //Get current position of a bug
+
+    //Check if the bug is at any edge of the board in the direction it is currently facing
+    switch (getDirection()) { //Switch statement with cases with each direction to check for corners/edges
+        case Direction::North:
+            if (currentPosition.second == 0) { //Way is blocked at the north edge of the board
+                return true;
+            }
+            break;
+        case Direction::East:
+            if (currentPosition.first == 9) { //Way is blocked at the east edge of the board
+                return true;
+            }
+            break;
+        case Direction::South:
+            if (currentPosition.second == 9) { //Way is blocked at the south edge of the board
+                return true;
+            }
+            break;
+        case Direction::West:
+            if (currentPosition.first == 0) { //Way is blocked at the west edge of the board
+                return true;
+            }
+            break;
+    }
+    return false; //Way is not blocked in the bugs current facing direction
 }
 
 int Bug::getId() const {
