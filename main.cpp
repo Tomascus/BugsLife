@@ -13,7 +13,7 @@ void bugFileReader(vector<Bug*>& bug_vector);
 void displayAllBugs(const vector<Bug*>& bug_vector);
 void findBugById(const vector<Bug*>& bug_vector);
 void tapBugBoard(vector<Bug*>& bug_vector);
-//void displayBugHistory(const vector<Bug*>& bug_vector);
+void displayBugHistory(const vector<Bug*>& bug_vector);
 
 int main() {
 
@@ -26,7 +26,7 @@ int main() {
     displayAllBugs(bug_vector);
     //findBugById(bug_vector);
     tapBugBoard(bug_vector);
-    //displayBugHistory(bug_vector);
+    displayBugHistory(bug_vector);
 
 
     //Display the board
@@ -42,6 +42,41 @@ int main() {
     return 0;
 }
 
+//Feature 5
+
+void displayBugHistory(const vector<Bug*>& bug_vector) {
+    for (Bug* bug : bug_vector) { //Iterate through bug vector
+        cout << bug->getId() << " "; //Display Bug ID
+
+        // Display Bug Type
+        if (dynamic_cast<Crawler*>(bug)) {
+            cout << "Crawler ";
+        } else if (dynamic_cast<Hopper*>(bug)) {
+            cout << "Hopper ";
+        }
+
+        //Display path taken
+        cout << "Path: ";
+        const list<pair<int, int>>& path = bug->getPath(); //Get the path of the bug through reference called path
+
+        if (!path.empty()) {
+            //Display each position in the bug's path
+            for (const auto& pos : path) { //Iterator of path list
+                cout << "(" << pos.first << "," << pos.second << "),";
+            }
+        } else {
+            cout << "No path recorded";
+        }
+
+        if (!bug->isAlive()) {
+            cout << " Eaten by "; //IMPLEMENT LATER WITH EAT FUNCTIONALITY
+        } else {
+            cout << " Alive!"; // Display that the bug is alive
+        }
+
+        cout << endl;
+    }
+}
 
 //Feature 4
 
