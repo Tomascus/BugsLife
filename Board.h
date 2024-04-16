@@ -21,12 +21,12 @@ public:
     void tapBugBoard(); //Simulates bug movement
     string displayBugHistory(const vector<Bug *>& bug_vector); //Displays bug history
     void exit(); //Creates .out file with custom date and time containing bug history
+    void displayAllCells(); //Displays all cells on the board
 
 private:
     static const int boardSize = 10; //Size of the board
     vector<vector<sf::RectangleShape>> board; //vector for board cells
     vector<Bug*> bug_vector; //Create a vector of pointers to bug objects
-
     string getCurrentDateTime(); //Get current date and time for .out file
 };
 

@@ -26,7 +26,10 @@ int main() {
     cout << output << endl;
 
     //Creates .out file with custom date and time containing bug history
-    board.exit();
+    //board.exit();
+
+    //Displays all cells on the board
+    board.displayAllCells();
 
 
 

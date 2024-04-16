@@ -58,6 +58,43 @@ void Board::display() {
     }
 }
 
+//Feature 7
+
+void Board::displayAllCells() {
+
+    //NO MAPS FOR NOW
+    //Goes through the board and find coordinates of current cell
+    for (int i = 0; i < boardSize; ++i) {
+        for (int j = 0; j < boardSize; ++j) {
+            cout << "(" << i << "," << j << "): ";
+
+            //Checks if the current cell contains any bugs
+            bool hasBugs = false;
+            for (const auto& bug : bug_vector) { //Iterates through bug vector to look for bugs
+                const pair<int, int>& pos = bug->getPosition();
+                if (pos.first == i && pos.second == j) { //If bugs position in bug vector is the same as current cell set hasBugs to true
+                    hasBugs = true;
+
+                    //Check for type
+                    if (dynamic_cast<Crawler*>(bug)) {
+                        cout << "Crawler " << bug->getId() << " ";
+                    } else if (dynamic_cast<Hopper*>(bug)) {
+                        cout << "Hopper " << bug->getId() << " ";
+                    }
+                }
+            }
+
+            //If no bugs are found, prints empty instead;
+            if (!hasBugs) {
+                cout << "Empty";
+            }
+
+            cout << endl; //Newline start
+        }
+    }
+}
+
+
 //Feature 6
 
 void Board::exit() {
