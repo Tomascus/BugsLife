@@ -7,6 +7,7 @@
 
 #include <utility> //class that enables to use std::pair for position definition
 #include <list> //class that enables to use std::list for path definition
+#include <string>
 
 
 enum class Direction { //separate enum class that includes all directions
@@ -33,6 +34,7 @@ public:
     void setPosition(const std::pair<int, int> &position);
     Direction getDirection() const;
     void setDirection(Direction direction);
+    std::string directionToString(int dir);
     int getSize() const;
     void setSize(int size);
     bool isAlive() const;

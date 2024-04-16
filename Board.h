@@ -6,18 +6,28 @@
 #define BUGSLIFE_BOARD_H
 
 #include <vector>
-
 #include <SFML/Graphics.hpp>
+#include "Bug.h"
 
+using namespace std;
 
 class Board {
 public:
-    Board(); // Constructor for board
+    Board(); //Constructor for board
     void display();
-private:
-    static constexpr int boardSize = 10; //Size of the board
-    std::vector<std::vector<sf::RectangleShape>> board; // vector for board cells
-};
+    void bugFileReader();
+    void displayAllBugs(); //Display all bugs in a formatted manner
+    void findBugById(); //Find a bug by inputting an ID
+    void tapBugBoard(); //Simulates bug movement
+    string displayBugHistory(const vector<Bug *>& bug_vector); //Displays bug history
+    void exit(); //Creates .out file with custom date and time containing bug history
 
+private:
+    static const int boardSize = 10; //Size of the board
+    vector<vector<sf::RectangleShape>> board; //vector for board cells
+    vector<Bug*> bug_vector; //Create a vector of pointers to bug objects
+
+    string getCurrentDateTime(); //Get current date and time for .out file
+};
 
 #endif //BUGSLIFE_BOARD_H

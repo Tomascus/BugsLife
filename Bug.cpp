@@ -87,6 +87,21 @@ void Bug::setDirection(Direction direction) {
     Bug::direction = direction;
 }
 
+std::string Bug::directionToString(int dir) {
+    switch (dir) {
+        case 1:
+            return "North";
+        case 2:
+            return "East";
+        case 3:
+            return "South";
+        case 4:
+            return "West";
+        default:
+            return "Unknown";
+    }
+}
+
 int Bug::getSize() const {
     return size;
 }
