@@ -18,8 +18,8 @@ void Crawler::move() {
 }
 
 Direction Crawler::RandomDirection() {
-    std::srand(std::time(nullptr)); //current time for random seed
-    int randDirection = std::rand() % 4 + 1; //Random generator from 1 to 4 for directions
+    srand(time(nullptr)); //current time for random seed
+    int randDirection = rand() % 4 + 1; //Random generator from 1 to 4 for directions
     switch (randDirection) {
         case 1:
             return Direction::North;
