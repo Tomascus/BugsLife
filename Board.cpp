@@ -62,38 +62,43 @@ void Board::display() {
 
 void Board::displayAllCells() {
 
-    //NO MAPS FOR NOW
-    //Goes through the board and find coordinates of current cell
-    for (int i = 0; i < boardSize; ++i) {
-        for (int j = 0; j < boardSize; ++j) {
-            cout << "(" << i << "," << j << "): ";
+    if (bugMap.empty()) {
+        populateBugMap(); //Create a map of bugs if it is not defined yet
+    }
 
-            //Checks if the current cell contains any bugs
-            bool hasBugs = false;
-            for (const auto& bug : bug_vector) { //Iterates through bug vector to look for bugs
-                const pair<int, int>& pos = bug->getPosition();
-                if (pos.first == i && pos.second == j) { //If bugs position in bug vector is the same as current cell set hasBugs to true
-                    hasBugs = true;
+    //Loop that goes through all cell positions and displays them
+    for (int y = 0; y < boardSize; ++y) {
+        for (int x = 0; x < boardSize; ++x) {
+            pair<int, int> pos = make_pair(x, y); //Create a pair of current position
+            cout << "(" << x << "," << y << "): ";
 
-                    //Check for type
+            //Check if Bug map contains bug/bugs on a current tile/square
+            if (bugMap.empty()) {
+                cout << "empty" << endl;
+            } else {
+                const vector<Bug*>& bugs = bugMap[pos]; //Create a vector of bugs for current square in case there are multiple bugs inside
+                for (int i = 0; i < bugs.size(); ++i) {
+                    Bug* bug = bugs[i]; //Pointer to bug in the vector
                     if (dynamic_cast<Crawler*>(bug)) {
                         cout << "Crawler " << bug->getId() << " ";
                     } else if (dynamic_cast<Hopper*>(bug)) {
                         cout << "Hopper " << bug->getId() << " ";
                     }
                 }
+                cout << endl;
             }
-
-            //If no bugs are found, prints empty instead;
-            if (!hasBugs) {
-                cout << "Empty";
-            }
-
-            cout << endl; //Newline start
         }
     }
 }
 
+//Bug Map - Maps position to the bugs
+
+void Board::populateBugMap() {
+    for (Bug* bug : bug_vector) { //Goes through the bug vector and pushes position to the bug map
+        pair<int, int> pos = bug->getPosition();
+        bugMap[pos].push_back(bug);
+    }
+}
 
 //Feature 6
 
@@ -149,11 +154,67 @@ string Board::displayBugHistory(const vector<Bug *>& bug_vector) {
 }
 
 
-//Feature 4
+//Feature 4 && Feature 8
 
 void Board::tapBugBoard() {
+    if (bugMap.empty()) {
+        populateBugMap(); //Create a map of bugs if it is not defined yet
+    }
+
+    //Iterate over each bug in the bug_vector and move it
     for (Bug* bug : bug_vector) {
         bug->move();
+
+        //Get the new position of the bug
+        pair<int, int> pos = bug->getPosition();
+
+        //Update the bug's position on the bugMap
+        bugMap[pos].push_back(bug);
+    }
+
+    //Iterate over the bug map
+    for (auto & iter : bugMap) {
+        //Get the bugs in the current cell
+        const vector<Bug*>& bugs = iter.second; //Gets the second value that is mapped to the location, in our case that is bug vector
+                                                //After, we create a bugs variable that holds all bugs in the current square
+
+
+        //If there are multiple bugs in the cell, fight
+        if (bugs.size() > 1) {
+            Bug* biggestBug = nullptr; //Set the bug pointer as nullptr until we assign a bug to it
+            int totalSize = 0;
+            vector<Bug*> equalBugs; //Vector that holds all bugs with the same size in a square
+
+            //Go through bugs vector and find the biggest bug and get total size of the square
+            for (Bug* bug : bugs) {
+                if (!biggestBug || bug->getSize() > biggestBug->getSize()) { //We need !biggestBug as it is set to nullptr at the start
+                    biggestBug = bug;
+                }
+                else if (bug->getSize() == biggestBug->getSize())
+                {
+                    equalBugs.push_back(bug);
+                }
+                totalSize += bug->getSize(); //Total size of the square needed for the final bug growth at the end of the fight
+            }
+
+            //If there are multiple bugs with equal size, randomly select one as the winner
+            if (equalBugs.size() > 1) {
+                biggestBug = equalBugs[rand() % equalBugs.size()]; //Determines the winner randomly, selecting random number from the equal bugs vector size
+            }
+
+            //Handles logic of removing dead bugs
+            for (Bug* bug : bugs) {
+                if (bug != biggestBug) {
+                    bug->setAlive(false); // Mark the bug as dead
+                    bug->setSize(0); // Update its size to 0
+                }
+            }
+
+            //Biggest bug grows based on eaten bugs size
+            if (biggestBug) {
+                biggestBug->setSize(biggestBug->getSize() + totalSize);
+            }
+        }
     }
 }
 
@@ -230,13 +291,13 @@ void Board::bugFileReader() {
     {
         char type;
         int id, x, y, direction, size;
-        int hop; // Additional value for Hopper bug
+        int hop; //Additional value for Hopper bug
         bool alive = true; //Default value for alive status
         list<pair<int, int>> path; //Default value for list of paths taken
 
         char delimiter;
         while (fin >> type >> delimiter >> id >> delimiter >> x >> delimiter >> y >> delimiter >> direction >> delimiter >> size) {
-            // Read additional data for Hopper bugs
+            //Read additional data for Hopper bugs
             if (type == 'H') {
                 fin >> delimiter >> hop;
             }
@@ -247,12 +308,12 @@ void Board::bugFileReader() {
             } else if (type == 'H') {
                 bug_vector.push_back(new Hopper(id, make_pair(x, y), static_cast<Direction>(direction), size, alive, path, hop));
             } else {
-                // Handle invalid type
+                //Handle invalid type
                 cout << "Invalid bug type: " << type << endl;
             }
         }
 
-        fin.close(); // Close the file after reading
+        fin.close(); //Close the file after reading
     } else {
         cout << "Unable to open file" << endl;
     }
@@ -264,7 +325,7 @@ string Board::getCurrentDateTime() {
     time_t now = time(0);
     tm* ltm = localtime(&now); //Converts address of "now" to tm used for formatting stored in a ltm pointer
 
-   stringstream ss; //Created a stringsteam object to store date and time in one string
+   stringstream ss; //Created a stringstream object to store date and time in one string
     ss << 1900 + ltm->tm_year << '-' //1900 is the start of year counting
        << 1 + ltm->tm_mon << '-' //holds 0-11, so we have to add 1 to start at correct month
        << ltm->tm_mday << '_' //Underscore to separate date and time
