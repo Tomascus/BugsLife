@@ -31,7 +31,7 @@ int main() {
     //Displays all cells on the board
     board.displayAllCells();
 
-
+    //board.runSimulation();
 
     return 0;
 }

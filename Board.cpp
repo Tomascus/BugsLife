@@ -10,6 +10,7 @@
 #include <ctime>
 #include <SFML/Graphics.hpp>
 #include <sstream>
+#include <unistd.h>
 
 using namespace sf;
 using namespace std;
@@ -56,6 +57,29 @@ void Board::display() {
 
         window.display();
     }
+}
+
+//Feature 9
+
+void Board::runSimulation() {
+
+    bugFileReader();
+    cout << "Welcome to the Bug's Life, The Game!" << endl;
+    displayAllBugs();
+    cout << "" << endl;
+
+    //Run simulation until the game is over
+    while (bugCount != 1) {
+
+        tapBugBoard();
+        string output = displayBugHistory(vector<Bug *>());
+        cout << output << endl;
+        displayAllCells();
+        cout << "" << endl;
+        //Wait for 1 second
+        sleep(1);
+    }
+    exit();
 }
 
 //Feature 7
@@ -144,7 +168,7 @@ string Board::displayBugHistory(const vector<Bug *>& bug_vector) {
             history += "No path recorded";
         }
         if (!bug->isAlive()) {
-            history += " Eaten by "; //IMPLEMENT LATER WITH EAT FUNCTIONALITY
+            history += " Eaten by " + winnerID;
         } else {
             history += " Alive!";  //Display that the bug is alive
         }
@@ -157,6 +181,9 @@ string Board::displayBugHistory(const vector<Bug *>& bug_vector) {
 //Feature 4 && Feature 8
 
 void Board::tapBugBoard() {
+
+    bugCount = 0;
+
     if (bugMap.empty()) {
         populateBugMap(); //Create a map of bugs if it is not defined yet
     }
@@ -164,6 +191,9 @@ void Board::tapBugBoard() {
     //Iterate over each bug in the bug_vector and move it
     for (Bug* bug : bug_vector) {
         bug->move();
+        if (bug->isAlive()) {
+            bugCount++;
+        }
 
         //Get the new position of the bug
         pair<int, int> pos = bug->getPosition();
@@ -207,12 +237,14 @@ void Board::tapBugBoard() {
                 if (bug != biggestBug) {
                     bug->setAlive(false); // Mark the bug as dead
                     bug->setSize(0); // Update its size to 0
+                    bugCount--;
                 }
             }
 
             //Biggest bug grows based on eaten bugs size
             if (biggestBug) {
                 biggestBug->setSize(biggestBug->getSize() + totalSize);
+                winnerID = (biggestBug->getId());
             }
         }
     }

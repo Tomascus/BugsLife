@@ -23,9 +23,12 @@ public:
     void exit(); //Creates .out file with custom date and time containing bug history
     void displayAllCells(); //Displays all cells on the board
     void populateBugMap();
+    void runSimulation();
 
 private:
     static const int boardSize = 10; //Size of the board
+    int winnerID = -1;
+    int bugCount;
     vector<vector<sf::RectangleShape>> board; //vector for board cells
     vector<Bug*> bug_vector; //Create a vector of pointers to bug objects
     string getCurrentDateTime(); //Get current date and time for .out file
