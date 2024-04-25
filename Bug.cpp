@@ -97,6 +97,14 @@ std::string Bug::directionToString(int dir) {
             return "South";
         case 4:
             return "West";
+        case 5:
+            return "NorthEast";
+        case 6:
+            return "SouthEast";
+        case 7:
+            return "SouthWest";
+        case 8:
+            return "NorthWest";
         default:
             return "Unknown";
     }

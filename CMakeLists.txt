@@ -11,7 +11,9 @@ add_executable(BugsLife main.cpp
         Hopper.cpp
         Hopper.h
         Board.cpp
-        Board.h)
+        Board.h
+        Burrower.cpp
+        Burrower.h)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 set(SFML_DIR C:/SFML-2.6.1/lib/cmake/SFML)

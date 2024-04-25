@@ -5,6 +5,7 @@
 #include "Board.h"
 #include "Crawler.h"
 #include "Hopper.h"
+#include "Burrower.h"
 #include <fstream>
 #include <iostream>
 #include <ctime>
@@ -97,20 +98,22 @@ void Board::displayAllCells() {
             cout << "(" << x << "," << y << "): ";
 
             //Check if Bug map contains bug/bugs on a current tile/square
-            if (bugMap.empty()) {
-                cout << "empty" << endl;
-            } else {
+            if (bugMap.count(pos)) {
                 const vector<Bug*>& bugs = bugMap[pos]; //Create a vector of bugs for current square in case there are multiple bugs inside
                 for (int i = 0; i < bugs.size(); ++i) {
                     Bug* bug = bugs[i]; //Pointer to bug in the vector
                     if (dynamic_cast<Crawler*>(bug)) {
                         cout << "Crawler " << bug->getId() << " ";
+                    } else if (dynamic_cast<Burrower*>(bug)) {
+                        cout << "Burrower " << bug->getId() << " ";
                     } else if (dynamic_cast<Hopper*>(bug)) {
                         cout << "Hopper " << bug->getId() << " ";
                     }
                 }
-                cout << endl;
+            } else {
+                cout << "empty"; // No bugs in this cell
             }
+            cout << endl;
         }
     }
 }
@@ -152,6 +155,8 @@ string Board::displayBugHistory(const vector<Bug *>& bug_vector) {
         //Display Bug Type
         if (dynamic_cast<Crawler*>(bug)) {
             history += "Crawler ";
+        } else if (dynamic_cast<Burrower*>(bug)) {
+            history += "Burrower ";
         } else if (dynamic_cast<Hopper*>(bug)) {
             history += "Hopper ";
         }
@@ -184,9 +189,7 @@ void Board::tapBugBoard() {
 
     bugCount = 0;
 
-    if (bugMap.empty()) {
-        populateBugMap(); //Create a map of bugs if it is not defined yet
-    }
+    bugMap.clear();
 
     //Iterate over each bug in the bug_vector and move it
     for (Bug* bug : bug_vector) {
@@ -265,6 +268,8 @@ void Board::findBugById() {
             cout << "ID: " << bug->getId() << endl;
             if (dynamic_cast<Crawler*>(bug)) {
                 cout << "Type: Crawler" << endl;
+            } else if (dynamic_cast<Burrower*>(bug)) {
+                cout << "Type: Burrower" << endl;
             } else if (dynamic_cast<Hopper*>(bug)) {
                 cout << "Type: Hopper" << endl;
                 Hopper* hopper = dynamic_cast<Hopper*>(bug);
@@ -296,6 +301,8 @@ void Board::displayAllBugs() {
         cout << bug->getId() << " "; //Display it based on current pointer to bug_vector
         if (dynamic_cast<Crawler*>(bug)) { //Dynamic cast required to determine what type of bug are we dealing with, if it is crawler display it
             cout << "Crawler "; //Display Crawler
+        } else if (dynamic_cast<Burrower*>(bug)) { //Dynamic cast required to determine what type of bug are we dealing with, if it is crawler display it
+            cout << "Burrower "; //Display Crawler
         } else if (dynamic_cast<Hopper*>(bug)) { //Same here, it checks for type of bug
             cout << "Hopper "; //Display Hopper
             Hopper* hopper = dynamic_cast<Hopper*>(bug); //Create pointer to a hopper bug/object with hopper variable that we can use to display additional features of such bug
@@ -339,6 +346,8 @@ void Board::bugFileReader() {
                 bug_vector.push_back(new Crawler(id, make_pair(x, y), static_cast<Direction>(direction), size, alive, path));
             } else if (type == 'H') {
                 bug_vector.push_back(new Hopper(id, make_pair(x, y), static_cast<Direction>(direction), size, alive, path, hop));
+            } else if (type == 'B') {
+                bug_vector.push_back(new Burrower(id, make_pair(x, y), static_cast<Direction>(direction), size, alive, path));
             } else {
                 //Handle invalid type
                 cout << "Invalid bug type: " << type << endl;
