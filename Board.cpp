@@ -12,6 +12,7 @@
 #include <SFML/Graphics.hpp>
 #include <sstream>
 #include <unistd.h>
+#include <valarray>
 
 using namespace sf;
 using namespace std;
@@ -21,8 +22,8 @@ Board::Board() {
     for (int i = 0; i < boardSize; ++i) { //Define a board height and width
         vector<RectangleShape> row;
         for (int j = 0; j < boardSize; ++j) {
-            RectangleShape cell(Vector2f(50, 50)); // Defined size of each cell
-            cell.setPosition(j * 50, i * 50); //Position the cell on the board based on the for loop state
+            RectangleShape cell(Vector2f(80, 80)); // Defined size of each cell
+            cell.setPosition(j * 80, i * 80); //Position the cell on the board based on the for loop state
             if ((i + j) % 2 == 0) {
                 cell.setFillColor(Color(76, 153, 0)); //Custom RGB Green color for even cells
             } else {
@@ -32,31 +33,23 @@ Board::Board() {
         }
         board.push_back(row); //Pushes each cell from rows to 2D vector of the board
     }
-
-
 }
 
-void Board::display() {
-    RenderWindow window(VideoMode(500, 500), "Bug Board");
+//Sprites from: https://admurin.itch.io/admurins-flora-and-fauna-0 and https://admurin.itch.io/admurins-insects
+void Board::loadTextures() //Separate method for loading textures/sprites, so they only generate once at the start
+{
+    if (!texture1.loadFromFile("sprites/Crawler.png")) { //Checks if it correctly loads the texture
+        cout << "Failed to load texture1 from file" << endl;
+    }
 
-    // Main loop
-    while (window.isOpen()) {
-        Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == Event::Closed)
-                window.close();
-        }
 
-        window.clear(Color::White);
+    if (!texture2.loadFromFile("sprites/Hopper.png")) {
+        cout << "Failed to load texture2 from file" << endl;
+    }
 
-        // Draw the board cells
-        for (int i = 0; i < boardSize; ++i) {
-            for (int j = 0; j < boardSize; ++j) {
-                window.draw(board[i][j]);
-            }
-        }
 
-        window.display();
+    if (!texture3.loadFromFile("sprites/Burrower.png")) {
+        cout << "Failed to load texture3 from file" << endl;
     }
 }
 
@@ -64,19 +57,68 @@ void Board::display() {
 
 void Board::runSimulation() {
 
+    loadTextures();
     bugFileReader();
     cout << "Welcome to the Bug's Life, The Game!" << endl;
     displayAllBugs();
     cout << "" << endl;
 
-    //Run simulation until the game is over
+    // Create SFML window
+    sf::RenderWindow window(sf::VideoMode(800, 800), "Bug Board");
+
+    //Runs the game until there is one bug left
     while (bugCount != 1) {
+        window.clear(sf::Color::White); //Clears the window
+
+        //Draw the board squares
+        for (int i = 0; i < boardSize; ++i) {
+            for (int j = 0; j < boardSize; ++j) {
+                window.draw(board[i][j]);
+            }
+        }
+
+        //Draw bugs on the board
+        for (const auto& bug : bug_vector) {
+
+            sf::Sprite sprite; //Created SFML sprite for the bug that is checked against its type to specify which one to use
+            if (dynamic_cast<Crawler*>(bug)) {
+                sprite.setTexture(texture1);
+            } else if (dynamic_cast<Hopper*>(bug)) {
+                sprite.setTexture(texture2);
+            } else if (dynamic_cast<Burrower*>(bug)) {
+                sprite.setTexture(texture3);
+            }
+
+            float scale = 10; //Scale value used to scale the initial bug, as all of them are based on bugSize, which is very small at the start
+            float bugSize = sqrt(bug->getSize()); //Used math(Square root) to slow the incremental size gaining, so that bugs do not overflow the squares very fast
+
+            //Setting scale based on the initial bug size divided by the texture sizes to keep the aspect ratio
+            sprite.setScale(scale * bugSize / sprite.getTexture()->getSize().x, scale * bugSize / sprite.getTexture()->getSize().y);
+
+            //Calculate the center position of the square that is 80x80, using offset of half a square for centering
+            int squareX = (bug->getPosition().first + 0.5) * 80;
+            int squareY = (bug->getPosition().second + 0.5) * 80;
+
+            //Sets the origin of the sprite to the center based on x and y coordinates
+            sprite.setOrigin(sprite.getTexture()->getSize().x / 2, sprite.getTexture()->getSize().y / 2);
+
+            //Sets the position of the sprite on the square
+            sprite.setPosition(squareX, squareY);
+
+            //Draw the bug on the window/board
+            window.draw(sprite);
+        }
+
+        //Display the window/board
+        window.display();
 
         tapBugBoard();
-        string output = displayBugHistory(vector<Bug *>());
+        /*string output = displayBugHistory(vector<Bug *>());
         cout << output << endl;
-        displayAllCells();
+        displayAllCells();*/
+        displayAllBugs();
         cout << "" << endl;
+
         //Wait for 1 second
         sleep(1);
     }
@@ -111,7 +153,7 @@ void Board::displayAllCells() {
                     }
                 }
             } else {
-                cout << "empty"; // No bugs in this cell
+                cout << "empty"; //No bugs in this cell
             }
             cout << endl;
         }
@@ -188,7 +230,6 @@ string Board::displayBugHistory(const vector<Bug *>& bug_vector) {
 void Board::tapBugBoard() {
 
     bugCount = 0;
-
     bugMap.clear();
 
     //Iterate over each bug in the bug_vector and move it
@@ -204,6 +245,8 @@ void Board::tapBugBoard() {
         //Update the bug's position on the bugMap
         bugMap[pos].push_back(bug);
     }
+
+    vector<Bug*> deadBugs; //Store bugs that died and should be removed
 
     //Iterate over the bug map
     for (auto & iter : bugMap) {
@@ -236,20 +279,28 @@ void Board::tapBugBoard() {
             }
 
             //Handles logic of removing dead bugs
-            for (Bug* bug : bugs) {
+            for (auto it = bugs.begin(); it != bugs.end(); ++it) {
+                Bug* bug = *it;
                 if (bug != biggestBug) {
-                    bug->setAlive(false); // Mark the bug as dead
-                    bug->setSize(0); // Update its size to 0
-                    bugCount--;
+                    bug->setAlive(false); //Change the alive status to false
+                    bug->setSize(0); //Update the size to 0
+                    deadBugs.push_back(bug); //Push it to the dead bugs vector that handles the removal
                 }
             }
-
             //Biggest bug grows based on eaten bugs size
             if (biggestBug) {
                 biggestBug->setSize(biggestBug->getSize() + totalSize);
                 winnerID = (biggestBug->getId());
             }
         }
+    }
+    //Remove bugs from the bug_vector that died - if their size is zero or are not alive
+    //I use eraser and predicate function that removes bugs
+    //bug_vector.erase(remove_if(bug_vector.begin(), bug_vector.end(), [](Bug* bug) { return bug->getSize() == 0 || !bug->isAlive(); }), bug_vector.end());
+
+    //Iterate over dead bug vector and deletes them
+    for (Bug* bug : deadBugs) {
+        bug_vector.erase(std::remove(bug_vector.begin(), bug_vector.end(), bug), bug_vector.end());
     }
 }
 
@@ -324,7 +375,7 @@ void Board::displayAllBugs() {
 //Feature 1
 
 void Board::bugFileReader() {
-    ifstream fin(R"(C:\Users\Thomas\CLionProjects\BugsLife\bugs.txt)");
+    ifstream fin("bugs.txt");
 
     if (fin)
     {

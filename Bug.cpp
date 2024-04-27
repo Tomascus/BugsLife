@@ -44,8 +44,18 @@ bool Bug::isWayBlocked() {
                 return true;
             }
             break;
+        case Direction::NorthEast:
+            if (currentPosition.second == 0 || currentPosition.first == 9) { //Way is blocked at the north-east edge of the board
+                return true;
+            }
+            break;
         case Direction::East:
             if (currentPosition.first == 9) { //Way is blocked at the east edge of the board
+                return true;
+            }
+            break;
+        case Direction::SouthEast:
+            if (currentPosition.second == 9 || currentPosition.first == 9) { //Way is blocked at the south-east edge of the board
                 return true;
             }
             break;
@@ -54,8 +64,18 @@ bool Bug::isWayBlocked() {
                 return true;
             }
             break;
+        case Direction::SouthWest:
+            if (currentPosition.second == 9 || currentPosition.first == 0) { //Way is blocked at the south-west edge of the board
+                return true;
+            }
+            break;
         case Direction::West:
             if (currentPosition.first == 0) { //Way is blocked at the west edge of the board
+                return true;
+            }
+            break;
+        case Direction::NorthWest:
+            if (currentPosition.second == 0 || currentPosition.first == 0) { //Way is blocked at the north-west edge of the board
                 return true;
             }
             break;

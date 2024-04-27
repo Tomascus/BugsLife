@@ -2,8 +2,7 @@
 // Created by Thomas on 09/04/2024.
 //
 
-#include <cstdlib>
-#include <ctime>
+#include <random>
 #include "Crawler.h"
 
 void Crawler::move() {
@@ -18,8 +17,12 @@ void Crawler::move() {
 }
 
 Direction Crawler::RandomDirection() {
-    srand(time(nullptr)); //current time for random seed
-    int randDirection = rand() % 4 + 1; //Random generator from 1 to 4 for directions
+
+    //I switched to c++ random library, because srand caused inefficient times for decisions in random direction function
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(1, 4); //Random int distribution between numbers 1 and 4
+    int randDirection = dist(gen); //Generates random number using previously specified dist and a generator
     switch (randDirection) {
         case 1:
             return Direction::North;

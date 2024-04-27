@@ -7,6 +7,8 @@
 
 #include "Bug.h"
 
+//New bug that moves diagonally
+
 class Burrower : public Bug {
 public:
     using Bug::Bug;  //Allows to use constructor from Parent Class "Bug"

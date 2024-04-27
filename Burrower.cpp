@@ -2,8 +2,7 @@
 // Created by Thomas on 25/04/2024.
 //
 
-#include <cstdlib>
-#include <ctime>
+#include <random>
 #include "Burrower.h"
 
 void Burrower::move() {
@@ -18,8 +17,12 @@ void Burrower::move() {
 }
 
 Direction Burrower::RandomDirection() {
-    srand(time(nullptr));
-    int randDirection = rand() % 4 + 1;
+    
+    //I switched to c++ random library, because srand caused inefficient times for decisions in random direction function
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(1, 4); //Random int distribution between numbers 1 and 4
+    int randDirection = dist(gen); //Generates random number using previously specified dist and a generator
     switch (randDirection) {
         case 1:
             return Direction::NorthEast;

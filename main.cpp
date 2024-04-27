@@ -2,14 +2,13 @@
 #include "Board.h"
 
 using namespace std;
-
 int main() {
 
     //Display the board
     Board board;
-    //board.display();
+    board.runSimulation();
 
-    //Read bugs from file and populate the vector
+    /*//Read bugs from file and populate the vector
     board.bugFileReader();
 
     //Display all bugs in a formatted manner
@@ -30,11 +29,11 @@ int main() {
 
     //Displays all cells on the board
     board.displayAllCells();
-
-    //board.runSimulation();
+    */
 
     return 0;
 }
+
 
 
 

@@ -14,7 +14,8 @@ using namespace std;
 class Board {
 public:
     Board(); //Constructor for board
-    void display();
+    void display(sf::RenderWindow& window);
+    void drawBugs(sf::RenderWindow& window);
     void bugFileReader();
     void displayAllBugs(); //Display all bugs in a formatted manner
     void findBugById(); //Find a bug by inputting an ID
@@ -24,6 +25,7 @@ public:
     void displayAllCells(); //Displays all cells on the board
     void populateBugMap();
     void runSimulation();
+    void loadTextures();
 
 private:
     static const int boardSize = 10; //Size of the board
@@ -33,6 +35,9 @@ private:
     vector<Bug*> bug_vector; //Create a vector of pointers to bug objects
     string getCurrentDateTime(); //Get current date and time for .out file
     map<pair<int, int>, vector<Bug*>> bugMap;
+    sf::Texture texture1;
+    sf::Texture texture2;
+    sf::Texture texture3;
 };
 
 #endif //BUGSLIFE_BOARD_H
