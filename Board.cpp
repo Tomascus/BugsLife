@@ -6,6 +6,7 @@
 #include "Crawler.h"
 #include "Hopper.h"
 #include "Burrower.h"
+#include "SuperBug.h"
 #include <fstream>
 #include <iostream>
 #include <ctime>
@@ -18,7 +19,7 @@ using namespace sf;
 using namespace std;
 
 Board::Board() {
-    // Initialize the board
+    //Initialize the board
     for (int i = 0; i < boardSize; ++i) { //Define a board height and width
         vector<RectangleShape> row;
         for (int j = 0; j < boardSize; ++j) {
@@ -35,21 +36,22 @@ Board::Board() {
     }
 }
 
+
+
 //Sprites from: https://admurin.itch.io/admurins-flora-and-fauna-0 and https://admurin.itch.io/admurins-insects
 void Board::loadTextures() //Separate method for loading textures/sprites, so they only generate once at the start
 {
     if (!texture1.loadFromFile("sprites/Crawler.png")) { //Checks if it correctly loads the texture
         cout << "Failed to load texture1 from file" << endl;
     }
-
-
     if (!texture2.loadFromFile("sprites/Hopper.png")) {
         cout << "Failed to load texture2 from file" << endl;
     }
-
-
     if (!texture3.loadFromFile("sprites/Burrower.png")) {
         cout << "Failed to load texture3 from file" << endl;
+    }
+    if (!texture4.loadFromFile("sprites/Superbug.png")) {
+        cout << "Failed to load texture4 from file" << endl;
     }
 }
 
@@ -60,6 +62,7 @@ void Board::runSimulation() {
     loadTextures();
     bugFileReader();
     cout << "Welcome to the Bug's Life, The Game!" << endl;
+    cout << endl;
     displayAllBugs();
     cout << "" << endl;
 
@@ -69,6 +72,29 @@ void Board::runSimulation() {
     //Runs the game until there is one bug left
     while (bugCount != 1) {
         window.clear(sf::Color::White); //Clears the window
+
+        // Event loop
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            switch (event.type) {
+                case sf::Event::Closed:
+                    window.close();
+                    break;
+                case sf::Event::KeyPressed:
+                    for (const auto& bug : bug_vector) { //Go through the bug vector until we find the superbug
+                        if (dynamic_cast<SuperBug*>(bug)) {
+                            superBug = dynamic_cast<SuperBug*>(bug); //Create a variable superBug
+                            break;
+                        }
+                    }
+                    if (superBug) { //use superBug variable to handle input (key press) from the superbug class
+                        superBug->handleInput(event.key.code);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
 
         //Draw the board squares
         for (int i = 0; i < boardSize; ++i) {
@@ -80,13 +106,15 @@ void Board::runSimulation() {
         //Draw bugs on the board
         for (const auto& bug : bug_vector) {
 
-            sf::Sprite sprite; //Created SFML sprite for the bug that is checked against its type to specify which one to use
+            sf::Sprite sprite; //Created SFML sprite for the bug that is checked based on its type to decide which one to use
             if (dynamic_cast<Crawler*>(bug)) {
                 sprite.setTexture(texture1);
             } else if (dynamic_cast<Hopper*>(bug)) {
                 sprite.setTexture(texture2);
             } else if (dynamic_cast<Burrower*>(bug)) {
                 sprite.setTexture(texture3);
+            } else if (dynamic_cast<SuperBug*>(bug)) {
+                sprite.setTexture(texture4);
             }
 
             float scale = 10; //Scale value used to scale the initial bug, as all of them are based on bugSize, which is very small at the start
@@ -109,20 +137,32 @@ void Board::runSimulation() {
             window.draw(sprite);
         }
 
+
         //Display the window/board
         window.display();
 
+        //Starts the movement
         tapBugBoard();
-        /*string output = displayBugHistory(vector<Bug *>());
+
+        //Additional information while the game is running, can be uncommented for testing purposes
+        string output = displayBugHistory();
         cout << output << endl;
-        displayAllCells();*/
+        displayAllCells();
         displayAllBugs();
         cout << "" << endl;
+        cout << bugCount << endl;
+        cout << endl;
 
         //Wait for 1 second
         sleep(1);
     }
-    exit();
+    exit(); //Exits the game when one bug remains and outputs the bug history to the file
+
+    //Free up memory
+    for (auto& bug : bug_vector) {
+        delete bug;
+    }
+    bug_vector.clear(); //Clears the vector, making it empty, ready to be used again
 }
 
 //Feature 7
@@ -148,6 +188,8 @@ void Board::displayAllCells() {
                         cout << "Crawler " << bug->getId() << " ";
                     } else if (dynamic_cast<Burrower*>(bug)) {
                         cout << "Burrower " << bug->getId() << " ";
+                    } else if (dynamic_cast<SuperBug*>(bug)) {
+                        cout << "SuperBug " << bug->getId() << " ";
                     } else if (dynamic_cast<Hopper*>(bug)) {
                         cout << "Hopper " << bug->getId() << " ";
                     }
@@ -177,7 +219,7 @@ void Board::exit() {
     ofstream fout(filename); //Create file output stream
 
     if (fout) {
-        fout << displayBugHistory(bug_vector); //Write bug history to the file
+        fout << displayBugHistory(); //Write bug history to the file
 
         fout.close(); //Close the file
         cout << "Bug life history saved to: " << filename << endl;
@@ -188,7 +230,7 @@ void Board::exit() {
 
 //Feature 5
 
-string Board::displayBugHistory(const vector<Bug *>& bug_vector) {
+string Board::displayBugHistory() {
     string history;
 
     for (const auto& bug : bug_vector) { //Iterate through bug vector
@@ -199,6 +241,8 @@ string Board::displayBugHistory(const vector<Bug *>& bug_vector) {
             history += "Crawler ";
         } else if (dynamic_cast<Burrower*>(bug)) {
             history += "Burrower ";
+        } else if (dynamic_cast<SuperBug*>(bug)) {
+            history += "SuperBug ";
         } else if (dynamic_cast<Hopper*>(bug)) {
             history += "Hopper ";
         }
@@ -215,7 +259,7 @@ string Board::displayBugHistory(const vector<Bug *>& bug_vector) {
             history += "No path recorded";
         }
         if (!bug->isAlive()) {
-            history += " Eaten by " + winnerID;
+            history += " Eaten by " + to_string(bug->getWinnerID());
         } else {
             history += " Alive!";  //Display that the bug is alive
         }
@@ -234,8 +278,9 @@ void Board::tapBugBoard() {
 
     //Iterate over each bug in the bug_vector and move it
     for (Bug* bug : bug_vector) {
-        bug->move();
-        if (bug->isAlive()) {
+        if (bug->isAlive()) { //Dead bugs do not move
+            bug->move();
+        } if (bug->isAlive() || bug->getSize()!=0) {
             bugCount++;
         }
 
@@ -246,8 +291,6 @@ void Board::tapBugBoard() {
         bugMap[pos].push_back(bug);
     }
 
-    vector<Bug*> deadBugs; //Store bugs that died and should be removed
-
     //Iterate over the bug map
     for (auto & iter : bugMap) {
         //Get the bugs in the current cell
@@ -255,8 +298,8 @@ void Board::tapBugBoard() {
                                                 //After, we create a bugs variable that holds all bugs in the current square
 
 
-        //If there are multiple bugs in the cell, fight
-        if (bugs.size() > 1) {
+        //If there is at least one bug in the cell, fight - needed if superbug invades other squares with one bug
+        if (!bugs.empty()) {
             Bug* biggestBug = nullptr; //Set the bug pointer as nullptr until we assign a bug to it
             int totalSize = 0;
             vector<Bug*> equalBugs; //Vector that holds all bugs with the same size in a square
@@ -270,7 +313,7 @@ void Board::tapBugBoard() {
                 {
                     equalBugs.push_back(bug);
                 }
-                totalSize += bug->getSize(); //Total size of the square needed for the final bug growth at the end of the fight
+                totalSize += bug->getSize(); //Calculation of bug sizes inside the square
             }
 
             //If there are multiple bugs with equal size, randomly select one as the winner
@@ -278,32 +321,20 @@ void Board::tapBugBoard() {
                 biggestBug = equalBugs[rand() % equalBugs.size()]; //Determines the winner randomly, selecting random number from the equal bugs vector size
             }
 
-            //Handles logic of removing dead bugs
+            //Handles logic of fight outcome, deciding winner and losers
             for (auto it = bugs.begin(); it != bugs.end(); ++it) {
                 Bug* bug = *it;
+                bug->setWinnerID(biggestBug->getId()); // Set the winnerID
                 if (bug != biggestBug) {
                     bug->setAlive(false); //Change the alive status to false
                     bug->setSize(0); //Update the size to 0
-                    deadBugs.push_back(bug); //Push it to the dead bugs vector that handles the removal
                 }
             }
             //Biggest bug grows based on eaten bugs size
-            if (biggestBug) {
-                biggestBug->setSize(biggestBug->getSize() + totalSize);
-                winnerID = (biggestBug->getId());
-            }
+            biggestBug->setSize(biggestBug->getSize() + totalSize - biggestBug->getSize()); //We subtract the current size from the new size so that the bug only grows by the totalSize, not its own size aswell
         }
     }
-    //Remove bugs from the bug_vector that died - if their size is zero or are not alive
-    //I use eraser and predicate function that removes bugs
-    //bug_vector.erase(remove_if(bug_vector.begin(), bug_vector.end(), [](Bug* bug) { return bug->getSize() == 0 || !bug->isAlive(); }), bug_vector.end());
-
-    //Iterate over dead bug vector and deletes them
-    for (Bug* bug : deadBugs) {
-        bug_vector.erase(std::remove(bug_vector.begin(), bug_vector.end(), bug), bug_vector.end());
-    }
 }
-
 //Feature 3
 
 void Board::findBugById() {
@@ -321,6 +352,8 @@ void Board::findBugById() {
                 cout << "Type: Crawler" << endl;
             } else if (dynamic_cast<Burrower*>(bug)) {
                 cout << "Type: Burrower" << endl;
+            } else if (dynamic_cast<SuperBug*>(bug)) {
+                cout << "Type: SuperBug" << endl;
             } else if (dynamic_cast<Hopper*>(bug)) {
                 cout << "Type: Hopper" << endl;
                 Hopper* hopper = dynamic_cast<Hopper*>(bug);
@@ -352,8 +385,10 @@ void Board::displayAllBugs() {
         cout << bug->getId() << " "; //Display it based on current pointer to bug_vector
         if (dynamic_cast<Crawler*>(bug)) { //Dynamic cast required to determine what type of bug are we dealing with, if it is crawler display it
             cout << "Crawler "; //Display Crawler
-        } else if (dynamic_cast<Burrower*>(bug)) { //Dynamic cast required to determine what type of bug are we dealing with, if it is crawler display it
+        } else if (dynamic_cast<Burrower*>(bug)) { //Dynamic cast required to determine what type of bug are we dealing with, if it is burrower display it
             cout << "Burrower "; //Display Crawler
+        } else if (dynamic_cast<SuperBug*>(bug)) { //Dynamic cast required to determine what type of bug are we dealing with, if it is superbug display it
+            cout << "SuperBug "; //Display Crawler
         } else if (dynamic_cast<Hopper*>(bug)) { //Same here, it checks for type of bug
             cout << "Hopper "; //Display Hopper
             Hopper* hopper = dynamic_cast<Hopper*>(bug); //Create pointer to a hopper bug/object with hopper variable that we can use to display additional features of such bug
@@ -392,6 +427,7 @@ void Board::bugFileReader() {
                 fin >> delimiter >> hop;
             }
 
+
             //Allocating bugs on heap, pointer/address to it is allocated on bug_vector
             if (type == 'C') {
                 bug_vector.push_back(new Crawler(id, make_pair(x, y), static_cast<Direction>(direction), size, alive, path));
@@ -399,6 +435,8 @@ void Board::bugFileReader() {
                 bug_vector.push_back(new Hopper(id, make_pair(x, y), static_cast<Direction>(direction), size, alive, path, hop));
             } else if (type == 'B') {
                 bug_vector.push_back(new Burrower(id, make_pair(x, y), static_cast<Direction>(direction), size, alive, path));
+            } else if (type == 'S') {
+                bug_vector.push_back(new SuperBug(id, make_pair(x, y), static_cast<Direction>(direction), size, alive, path));
             } else {
                 //Handle invalid type
                 cout << "Invalid bug type: " << type << endl;

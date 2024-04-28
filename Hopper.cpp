@@ -18,11 +18,10 @@ Hopper::Hopper(int id, std::pair<int, int> position, Direction direction, int si
     this->hopLength = hopLength;
 }
 
-
 void Hopper::move() {
     if (isWayBlocked()) { //Implements Bug method isWayBlocked
         do {
-            direction = RandomDirection();
+            direction = RandomDirection(); // Choose a new random direction
         } while (isWayBlocked()); //Do while loop - first changes directions to attempt to face away from edges/walls
     }
 
@@ -49,19 +48,35 @@ Direction Hopper::RandomDirection() {
     }
 }
 
-void Hopper::moveInDirection(Direction direction, int hopLength) { //Basic move implementation as of now
+void Hopper::moveInDirection(Direction direction, int hopLength) {
     switch (direction) {
         case Direction::North:
-            position.second -= hopLength;
+            if (position.second - hopLength >= 0) { //Checks if hopping would cause it to still be on the board
+                position.second -= hopLength;
+            } else {
+                position.second = 0; //If not, bounce back to the nearest edge
+            }
             break;
         case Direction::East:
-            position.first += hopLength;
+            if (position.first + hopLength <= 9) {
+                position.first += hopLength;
+            } else {
+                position.first = 9;
+            }
             break;
         case Direction::South:
-            position.second += hopLength;
+            if (position.second + hopLength <= 9) {
+                position.second += hopLength;
+            } else {
+                position.second = 9;
+            }
             break;
         case Direction::West:
-            position.first -= hopLength;
+            if (position.first - hopLength >= 0) {
+                position.first -= hopLength;
+            } else {
+                position.first = 0;
+            }
             break;
     }
 }

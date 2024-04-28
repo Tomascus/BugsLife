@@ -80,7 +80,7 @@ bool Bug::isWayBlocked() {
             }
             break;
     }
-    return false; //Way is not blocked in the bugs current facing direction
+    return false; //Way is not blocked in the bug's current facing direction
 }
 
 int Bug::getId() const {
@@ -152,6 +152,15 @@ const std::list<std::pair<int, int>> &Bug::getPath() const {
 
 void Bug::setPath(const std::list<std::pair<int, int>> &path) {
     Bug::path = path;
+}
+
+void Bug::setWinnerID(int id) {
+    winnerID = id;
+}
+
+// Add a new method to get the winnerID
+int Bug::getWinnerID() const {
+    return winnerID;
 }
 
 

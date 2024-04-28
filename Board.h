@@ -8,6 +8,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "Bug.h"
+#include "SuperBug.h"
 
 using namespace std;
 
@@ -20,7 +21,7 @@ public:
     void displayAllBugs(); //Display all bugs in a formatted manner
     void findBugById(); //Find a bug by inputting an ID
     void tapBugBoard(); //Simulates bug movement
-    string displayBugHistory(const vector<Bug *>& bug_vector); //Displays bug history
+    string displayBugHistory(); //Displays bug history
     void exit(); //Creates .out file with custom date and time containing bug history
     void displayAllCells(); //Displays all cells on the board
     void populateBugMap();
@@ -29,8 +30,8 @@ public:
 
 private:
     static const int boardSize = 10; //Size of the board
-    int winnerID = -1;
     int bugCount;
+    SuperBug* superBug; //pointer to the superbug object
     vector<vector<sf::RectangleShape>> board; //vector for board cells
     vector<Bug*> bug_vector; //Create a vector of pointers to bug objects
     string getCurrentDateTime(); //Get current date and time for .out file
@@ -38,6 +39,7 @@ private:
     sf::Texture texture1;
     sf::Texture texture2;
     sf::Texture texture3;
+    sf::Texture texture4;
 };
 
 #endif //BUGSLIFE_BOARD_H

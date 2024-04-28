@@ -35,7 +35,7 @@ Direction Crawler::RandomDirection() {
     }
 }
 
-void Crawler::moveInDirection(Direction direction) { //Basic move implementation as of now
+void Crawler::moveInDirection(Direction direction) {
     switch (direction) {
         case Direction::North:
             position.second -= 1;

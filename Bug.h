@@ -45,6 +45,9 @@ public:
     void setAlive(bool alive);
     const std::list<std::pair<int, int>> &getPath() const;
     void setPath(const std::list<std::pair<int, int>> &path);
+    int winnerID = -1;
+    void setWinnerID(int id);
+    int getWinnerID() const;
 
 public:
     Bug(); //Empty constructor

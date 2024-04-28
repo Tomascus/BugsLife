@@ -17,12 +17,11 @@ private:
 public:
     int getHopLength() const;
     void setHopLength(int hopLength);
-
 private:
-
     void move() override;  //Overrides the virtual function in Bug class to Crawler bug
     Direction RandomDirection();
     void moveInDirection(Direction direction, int hopLength);
+
 };
 
 #endif //BUGSLIFE_HOPPER_H

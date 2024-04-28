@@ -13,7 +13,9 @@ add_executable(BugsLife main.cpp
         Board.cpp
         Board.h
         Burrower.cpp
-        Burrower.h)
+        Burrower.h
+        "SuperBug.cpp"
+        "SuperBug.h")
 
 set(SFML_STATIC_LIBRARIES TRUE)
 set(SFML_DIR C:/SFML-2.6.1/lib/cmake/SFML)
