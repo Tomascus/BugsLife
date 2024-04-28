@@ -36,7 +36,7 @@ int main() {
             case 2:
                 //Display all bugs in a formatted manner
                 board.displayAllBugs();
-                cout << "Please select option 1. first to initialize the bugs from the file" << endl;
+                cout << "Make sure to select option 1. first to initialize the bugs from the file" << endl;
                 break;
             case 3:
                 //Find a bug by inputting an ID

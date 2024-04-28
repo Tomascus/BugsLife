@@ -145,13 +145,13 @@ void Board::runSimulation() {
         tapBugBoard();
 
         //Additional information while the game is running, can be uncommented for testing purposes
-        string output = displayBugHistory();
+        /*string output = displayBugHistory();
         cout << output << endl;
         displayAllCells();
         displayAllBugs();
         cout << "" << endl;
         cout << bugCount << endl;
-        cout << endl;
+        cout << endl;*/
 
         //Wait for 1 second
         sleep(1);
